@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const dotenv = require('dotenv');
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./history-twister.db');
 
 // Load environment variables
 dotenv.config();
