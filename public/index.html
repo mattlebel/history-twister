@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History Twister</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-16">
@@ -37,9 +38,13 @@
                 </li>
             </ul>
         </div>
+        <div id="loading" class="hidden">
+          <h2 class="mb-4">Twisting history...</h2>
+          <div class="loading"></div>
+        </div>
     </div>
 
-    <script>
+<!--     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const twistHistoryButton = document.querySelector('button');
             const examplePrompts = document.querySelectorAll('.example-prompt');
@@ -95,6 +100,49 @@
                 });
             }
         });
+    </script> -->
+
+    <script>
+      document.getElementById('twistHistory').addEventListener('click', async () => {
+        const prompt = document.getElementById('prompt').value;
+        const outputFormat = document.getElementById('outputFormat').value;
+
+        if (!prompt || !outputFormat) {
+          alert('Please enter a prompt and select an output format.');
+          return;
+        }
+
+        // Show the loading message
+        document.getElementById('loading').classList.remove('hidden');
+
+        // Send the API request
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, outputFormat }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to generate twisted history');
+          }
+
+          const data = await response.json();
+
+          // Hide the loading message
+          document.getElementById('loading').classList.add('hidden');
+
+          // Redirect to the Results page
+          location.href = `/twist/${data.guid}`;
+        } catch (error) {
+          alert('An error occurred. Please try again.');
+          console.error(error);
+
+          // Hide the loading message
+          document.getElementById('loading').classList.add('hidden');
+        }
+      });
     </script>
+
 </body>
 </html>
