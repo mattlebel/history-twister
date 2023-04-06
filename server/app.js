@@ -56,6 +56,14 @@ function generateGuid() {
     });
 }
 
+app.get('/twist/:guid', (req, res) => {
+  // Retrieve the result associated with the given GUID from the database (not implemented here)
+  // ...
+
+  // Render the Results page with the retrieved content
+  res.sendFile(path.join(__dirname, '../public', 'results.html'));
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

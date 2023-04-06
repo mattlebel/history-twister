@@ -28,13 +28,13 @@
             <h2 class="text-2xl font-semibold mb-4">Example Prompts:</h2>
             <ul class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <li class="bg-white p-4 rounded-lg shadow-md">
-                    <a href="#" class="text-blue-500 hover:text-blue-600">Imagine the newspaper headlines on the day after the US lost World War 2</a>
+                    <a href="#" class="text-blue-500 hover:text-blue-600 example-prompt">Imagine the newspaper headlines on the day after the US lost World War 2</a>
                 </li>
                 <li class="bg-white p-4 rounded-lg shadow-md">
-                    <a href="#" class="text-blue-500 hover:text-blue-600">It's 2027 and the sitting US president directed the FBI to unseal records that indicate that President Kennedy was killed by multiple Russian agents on the Grassy Knoll.</a>
+                    <a href="#" class="text-blue-500 hover:text-blue-600 example-prompt">It's 2027 and the sitting US president directed the FBI to unseal records that indicate that President Kennedy was killed by multiple Russian agents on the Grassy Knoll.</a>
                 </li>
                 <li class="bg-white p-4 rounded-lg shadow-md">
-                    <a href="#" class="text-blue-500 hover:text-blue-600">What would have happened if the attack on Pearl Harbor had been Thwarted?</a>
+                    <a href="#" class="text-blue-500 hover:text-blue-600 example-prompt">What would have happened if the attack on Pearl Harbor had been Thwarted?</a>
                 </li>
             </ul>
         </div>
@@ -44,7 +44,7 @@
         </div>
     </div>
 
-<!--     <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const twistHistoryButton = document.querySelector('button');
             const examplePrompts = document.querySelectorAll('.example-prompt');
@@ -61,7 +61,7 @@
                 });
             });
 
-            function handleTwistHistory() {
+            async function handleTwistHistory() {
                 const promptText = inputBox.value.trim();
                 const outputFormat = outputFormatSelect.value;
 
@@ -71,77 +71,37 @@
                 }
 
                 // Show loading message and animation
-                // ...
+                document.getElementById('loading').classList.remove('hidden');
 
-                fetch('/api/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: promptText, outputFormat }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Hide loading message and animation
-                    // ...
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ prompt: promptText, outputFormat }),
+                    });
 
-                    if (data.error) {
-                        alert('An error occurred. Please try again.');
-                    } else {
-                        // Redirect to the results page
-                        window.location.href = `/twist/${data.guid}`;
+                    if (!response.ok) {
+                        throw new Error('Failed to generate twisted history');
                     }
-                })
-                .catch(() => {
-                    // Hide loading message and animation
-                    // ...
 
+                    const data = await response.json();
+
+                    // Hide loading message and animation
+                    document.getElementById('loading').classList.add('hidden');
+
+                    // Redirect to the results page
+                    window.location.href = `/twist/${data.guid}`;
+                } catch (error) {
                     alert('An error occurred. Please try again.');
-                });
+                    console.error(error);
+
+                    // Hide loading message and animation
+                    document.getElementById('loading').classList.add('hidden');
+                }
             }
         });
-    </script> -->
-
-    <script>
-      document.getElementById('twistHistory').addEventListener('click', async () => {
-        const prompt = document.getElementById('prompt').value;
-        const outputFormat = document.getElementById('outputFormat').value;
-
-        if (!prompt || !outputFormat) {
-          alert('Please enter a prompt and select an output format.');
-          return;
-        }
-
-        // Show the loading message
-        document.getElementById('loading').classList.remove('hidden');
-
-        // Send the API request
-        try {
-          const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt, outputFormat }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to generate twisted history');
-          }
-
-          const data = await response.json();
-
-          // Hide the loading message
-          document.getElementById('loading').classList.add('hidden');
-
-          // Redirect to the Results page
-          location.href = `/twist/${data.guid}`;
-        } catch (error) {
-          alert('An error occurred. Please try again.');
-          console.error(error);
-
-          // Hide the loading message
-          document.getElementById('loading').classList.add('hidden');
-        }
-      });
     </script>
 
 </body>

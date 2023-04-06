@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <title>Twisted History Results - History Twister</title>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto py-12">
+    <h1 class="text-4xl font-bold mb-4">Twisted History Results</h1>
+    <p id="twistedHistory" class="bg-white p-6 rounded-lg shadow-md text-lg">
+      <!-- The generated content will be displayed here -->
+    </p>
+  </div>
+  <script>
+    // Retrieve the GUID from the URL
+    const guid = location.pathname.split('/').pop();
+
+    // Fetch the generated content associated with the GUID from the backend (not implemented here)
+    // ...
+
+    // Insert the fetched content into the "twistedHistory" element
+    document.getElementById('twistedHistory').textContent = 'Fetched content goes here';
+  </script>
+</body>
+</html>
