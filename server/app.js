@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const dotenv = require('dotenv');
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
 const db = new sqlite3.Database('./history-twister.db');
 
 // Load environment variables
@@ -12,7 +14,7 @@ const app = express();
 
 // Middlewares
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API endpoint for generating twisted history
 app.post('/api/generate', async (req, res) => {
