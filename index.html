@@ -11,7 +11,14 @@
         <h1 class="text-5xl font-bold mb-6">History Twister</h1>
         <p class="text-xl mb-8">Twist history and read newspaper headlines, first-hand accounts, and more!</p>
         <div class="mb-6">
-            <input type="text" placeholder="Enter your desired twisted history..." class="w-full p-4 bg-white rounded-lg shadow-md text-lg">
+            <input type="text" placeholder="Enter your desired twisted history..." class="w-full p-4 bg-white rounded-lg shadow-md text-lg mb-4">
+            <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
+            <select id="outputFormat" class="w-full p-4 bg-white rounded-lg shadow-md text-lg">
+                <option value="newspaper">As a newspaper article</option>
+                <option value="blog">As a blog post</option>
+                <option value="essay">As a short essay</option>
+                <option value="frontpage">As a newspaper front page (headlines + excerpts)</option>
+            </select>
         </div>
         <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
 
