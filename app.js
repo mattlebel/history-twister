@@ -107,7 +107,7 @@ app.get('/twist/:guid', (req, res) => {
   const { guid } = req.params;
 
   // Retrieve the result associated with the given GUID from the database
-  db.query('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
+  db.query('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = $1', [guid], (error, row) => {
     if (error) {
       console.error('Error retrieving from the database:', error);
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
