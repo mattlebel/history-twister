@@ -1,19 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 const dotenv = require('dotenv');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { Configuration, OpenAIApi } = require('openai');
 
 const db = new sqlite3.Database('./history-twister.db');
 
 // Load environment variables
 dotenv.config();
 
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
 const app = express();
 
 // Middlewares
 app.use(bodyParser.json());
+app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API endpoint for generating twisted history
@@ -26,20 +32,16 @@ app.post('/api/generate', async (req, res) => {
     }
 
     try {
-        const response = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
+        const response = await openai.createCompletion({
+            model: 'text-davinci-003',
             prompt: `Imagine a ${outputFormat} about ${prompt}`,
             max_tokens: 200,
             n: 1,
             stop: null,
             temperature: 0.8,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
         });
 
-        const result = response.data.choices[0].text.trim();
+        const result = response.choices[0].text.trim();
         const guid = generateGuid();
 
         // Save the result and GUID to the database (not implemented here)
@@ -47,7 +49,8 @@ app.post('/api/generate', async (req, res) => {
 
         res.json({ guid, result });
     } catch (error) {
-        console.error(error);
+        console.error('Error during API request:', error.message);
+        console.error('Error details:', error);
         res.status(500).json({ error: 'Failed to generate twisted history' });
     }
 });
