@@ -44,13 +44,20 @@ app.post('/api/generate', async (req, res) => {
         const result = response.choices[0].text.trim();
         const guid = generateGuid();
 
-        // Save the result and GUID to the database (not implemented here)
-        // ...
+        // Save the result and GUID to the database
+        db.run('INSERT INTO twisted_history (guid, content) VALUES (?, ?)', [guid, result], (error) => {
+            if (error) {
+                console.error('Error saving to the database:', error);
+                return res.status(500).json({ error: 'Failed to save twisted history' });
+            }
 
-        res.json({ guid, result });
+            res.json({ guid, result });
+        });
+
     } catch (error) {
         console.error('Error during API request:', error.message);
         console.error('Error details:', error);
+        console.error('Request data:', { prompt, outputFormat });
         res.status(500).json({ error: 'Failed to generate twisted history' });
     }
 });
@@ -64,11 +71,22 @@ function generateGuid() {
 }
 
 app.get('/twist/:guid', (req, res) => {
-  // Retrieve the result associated with the given GUID from the database (not implemented here)
-  // ...
+    const { guid } = req.params;
 
-  // Render the Results page with the retrieved content
-  res.sendFile(path.join(__dirname, '../public', 'results.html'));
+  // Retrieve the result associated with the given GUID from the database
+  db.get('SELECT content FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
+      if (error) {
+          console.error('Error retrieving from the database:', error);
+          return res.status(500).json({ error: 'Failed to retrieve twisted history' });
+      }
+
+      if (!row) {
+          return res.status(404).json({ error: 'Twisted history not found' });
+      }
+
+      // Render the Results page with the retrieved content
+      res.sendFile(path.join(__dirname, '../public', 'results.html'));
+  });
 });
 
 const port = process.env.PORT || 3000;
