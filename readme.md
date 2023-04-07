@@ -50,3 +50,28 @@ Start the application by running:
 `npm start`
 
 The application should now be running at [http://localhost:3000](http://localhost:3000).
+
+## Database Configuration
+
+For local development, this application uses SQLite. For production, it uses PostgreSQL. The application automatically switches between SQLite and PostgreSQL based on the `NODE_ENV` environment variable.
+
+## Deploying to Heroku
+
+1. Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) and log in to your Heroku account:
+`heroku login`
+
+2. Create a new Heroku application:
+
+`heroku create your-app-name`
+
+3. Via the Heroku dashboard, add the Heroku PostgreSQL add-on
+
+4. Via the Heroku dashboard, set your OpenAI API key and `NODE_ENV` as a Heroku environment variables
+
+5. Deploy your application to Heroku:
+
+`git push heroku main`
+
+6. Open your deployed application in a web browser:
+
+`heroku open`
