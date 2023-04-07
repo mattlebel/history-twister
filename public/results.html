@@ -64,13 +64,13 @@
     fetch(`/twist/${guid}`)
       .then(response => {
         if (!response.ok) {
-          throw new Error('Error fetching twisted history');
+          throw new Error(`Error fetching twisted history, status: ${response.status}`);
         }
         return response.json();
       })
       .then(data => {
         if (!data.content || !data.originalPrompt || !data.outputFormat) {
-          throw new Error('Error fetching twisted history');
+          throw new Error('Error fetching twisted history: Missing data');
         }
 
         fetchedData = data; // Assign the fetched data to the variable
@@ -88,7 +88,7 @@
       })
       .catch(error => {
         console.error(error);
-        document.getElementById('twistedHistory').textContent = 'Error fetching twisted history';
+        document.getElementById('twistedHistory').textContent = error.message;
       });
 
       document.getElementById('aboutButton').addEventListener('click', () => {

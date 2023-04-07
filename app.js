@@ -8,17 +8,32 @@ const cookieParser = require('cookie-parser');
 
 const db = require('./dbConfig');
 
-const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS twisted_history (
-    id SERIAL PRIMARY KEY,
-    guid UUID UNIQUE NOT NULL,
-    content TEXT NOT NULL,
-    original_prompt TEXT NOT NULL,
-    output_format VARCHAR(255) NOT NULL,
-    user_guid UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-  );
-`;
+const isProduction = process.env.NODE_ENV === 'production';
+
+const createTableQuery = isProduction
+  ? `
+    CREATE TABLE IF NOT EXISTS twisted_history (
+      id SERIAL PRIMARY KEY,
+      guid UUID UNIQUE NOT NULL,
+      content TEXT NOT NULL,
+      original_prompt TEXT NOT NULL,
+      output_format VARCHAR(255) NOT NULL,
+      user_guid UUID NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `
+  : `
+    CREATE TABLE IF NOT EXISTS twisted_history (
+      id INTEGER PRIMARY KEY,
+      guid TEXT UNIQUE NOT NULL,
+      content TEXT NOT NULL,
+      original_prompt TEXT NOT NULL,
+      output_format TEXT NOT NULL,
+      user_guid TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
 
 db.query(createTableQuery, (err, res) => {
   if (err) {
@@ -113,17 +128,31 @@ app.get('/twist/:guid', (req, res) => {
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
     }
 
-    if (!result.rows || result.rows.length === 0) {
+    if (!result || result.length === 0) {
       return res.status(404).json({ error: 'Twisted history not found' });
     }
 
     // Extract the row data from the result
-    const row = result.rows[0];
+    const row = result[0]; // Update this line
 
     // Send the twisted history content as a JSON object
     res.json({ content: row.content, outputFormat: row.output_format, originalPrompt: row.original_prompt });
   });
 });
+
+// Make sqlite3 table easily accessible locally
+if (!isProduction) {
+  app.get('/api/twisted_history', (req, res) => {
+      db.query('SELECT * FROM twisted_history', [], (error, rows) => {
+          if (error) {
+              console.error('Error retrieving from the database:', error);
+              return res.status(500).json({ error: 'Failed to retrieve twisted history entries' });
+          }
+
+          res.json(rows);
+      });
+  });
+}
 
 
 const port = process.env.PORT || 3000;
