@@ -34,12 +34,20 @@
       <a id="emailShare" href="#" class="mr-4">Email</a>
       <a id="twitterShare" href="#" target="_blank">Twitter</a>
     </div>
+
+    <div id="loading" class="fixed inset-0 flex items-center justify-center hidden">
+      <div class="bg-white p-8 rounded">
+        <div class="loading"></div>
+        <p class="mt-4 text-lg">Remixing history...</p>
+      </div>
+    </div>
   </div>
 
   <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
     <div class="bg-white p-8 w-full max-w-lg mx-auto rounded">
       <h2 class="text-2xl font-bold mb-4">About</h2>
-      <p>AI-powered alternative history: Explore headlines, first-hand accounts, and more!</p>
+      <p>Twist history with History Twister, powered by AI (text-davinci-003).</p><br>
+      <p>This app was written, debugged, and deployed entirely by ChatGPT (GPT-4) in April 2023.</p>
       <button id="closeModal" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Close</button>
     </div>
   </div>
@@ -68,6 +76,10 @@
 
         // Insert the fetched content into the "twistedHistory" element
         document.getElementById('twistedHistory').innerHTML = data.content.replace(/\n/g, '<br>');
+
+        // Save the original prompt and output format in localStorage
+        localStorage.setItem('previousPrompt', fetchedData.originalPrompt);
+        localStorage.setItem('previousOutputFormat', fetchedData.outputFormat);
       })
       .catch(error => {
         console.error(error);
@@ -96,7 +108,10 @@
       });
 
       document.getElementById('twistAgain').addEventListener('click', async () => {
-        const apiUrl = '/api/generate'; // Replace with your API endpoint
+        // Display the loading message and spinner
+        document.getElementById('loading').classList.remove('hidden');
+
+        const apiUrl = '/api/generate';
         const prompt = localStorage.getItem('previousPrompt');
         const outputFormat = localStorage.getItem('previousOutputFormat');
 
@@ -109,9 +124,12 @@
             body: JSON.stringify({ prompt, outputFormat })
           });
 
+          // Hide the loading message and spinner after the response is received
+          document.getElementById('loading').classList.add('hidden');
+
           if (response.ok) {
             const data = await response.json();
-            window.location.href = `/results.html?twist=${data.guid}`;
+            window.location.href = `/results.html?twist=${data.guid}&remixed=true`;
           } else {
             alert('An error occurred. Please try again.');
           }

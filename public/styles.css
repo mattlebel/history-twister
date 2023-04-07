@@ -1,5 +1,7 @@
 .loading {
-  display: inline-block;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   width: 80px;
   height: 80px;
   border: 8px solid #f3f3f3;
