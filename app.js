@@ -122,18 +122,6 @@ app.get('/twist/:guid', (req, res) => {
   });
 });
 
-app.get('/api/twisted_history', (req, res) => {
-    db.query('SELECT * FROM twisted_history', [], (error, rows) => {
-        if (error) {
-            console.error('Error retrieving from the database:', error);
-            return res.status(500).json({ error: 'Failed to retrieve twisted history entries' });
-        }
-
-        res.json(rows);
-    });
-});
-
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
