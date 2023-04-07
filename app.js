@@ -6,7 +6,7 @@ const path = require('path');
 const { Configuration, OpenAIApi } = require('openai');
 const cookieParser = require('cookie-parser');
 
-const db = new sqlite3.Database('./history-twister.db');
+const db = require('./dbConfig');
 
 // Load environment variables
 dotenv.config();
@@ -58,7 +58,7 @@ app.post('/api/generate', async (req, res) => {
         console.log(result);
 
         // Save the result and GUID to the database
-        db.run('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES (?, ?, ?, ?, ?)', [guid, result, prompt, outputFormat, userGuid], (error) => {
+        db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES (?, ?, ?, ?, ?)', [guid, result, prompt, outputFormat, userGuid], (error) => {
             if (error) {
                 console.error('Error saving to the database:', error);
                 return res.status(500).json({ error: 'Failed to save twisted history' });
@@ -87,7 +87,7 @@ app.get('/twist/:guid', (req, res) => {
   const { guid } = req.params;
 
   // Retrieve the result associated with the given GUID from the database
-  db.get('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
+  db.query('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
     if (error) {
       console.error('Error retrieving from the database:', error);
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
@@ -103,7 +103,7 @@ app.get('/twist/:guid', (req, res) => {
 });
 
 app.get('/api/twisted_history', (req, res) => {
-    db.all('SELECT * FROM twisted_history', [], (error, rows) => {
+    db.query('SELECT * FROM twisted_history', [], (error, rows) => {
         if (error) {
             console.error('Error retrieving from the database:', error);
             return res.status(500).json({ error: 'Failed to retrieve twisted history entries' });
