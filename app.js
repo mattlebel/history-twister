@@ -35,14 +35,16 @@ app.post('/api/generate', async (req, res) => {
         const response = await openai.createCompletion({
             model: 'text-davinci-003',
             prompt: `Imagine a ${outputFormat} about ${prompt}`,
-            max_tokens: 200,
+            max_tokens: 500,
             n: 1,
             stop: null,
             temperature: 0.8,
         });
 
-        const result = response.choices[0].text.trim();
+        const result = response.data.choices[0].text.trim();
         const guid = generateGuid();
+
+        console.log(result);
 
         // Save the result and GUID to the database
         db.run('INSERT INTO twisted_history (guid, content) VALUES (?, ?)', [guid, result], (error) => {
