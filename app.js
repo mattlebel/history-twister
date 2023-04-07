@@ -58,7 +58,7 @@ app.post('/api/generate', async (req, res) => {
         console.log(result);
 
         // Save the result and GUID to the database
-        db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES (?, ?, ?, ?, ?)', [guid, result, prompt, outputFormat, userGuid], (error) => {
+        db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES ($1, $2, $3, $4, $5)', [guid, result, prompt, outputFormat, userGuid], (error) => {
             if (error) {
                 console.error('Error saving to the database:', error);
                 return res.status(500).json({ error: 'Failed to save twisted history' });
