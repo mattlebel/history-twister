@@ -69,6 +69,10 @@
         return response.json();
       })
       .then(data => {
+        if (!data.content || !data.originalPrompt || !data.outputFormat) {
+          throw new Error('Error fetching twisted history');
+        }
+
         fetchedData = data; // Assign the fetched data to the variable
 
         // Populate the original prompt section
