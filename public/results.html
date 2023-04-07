@@ -18,7 +18,11 @@
 
   <div class="container mx-auto py-12">
     <h1 class="text-4xl font-bold mb-4">Your Twisted History:</h1>
-    <p id="twistedHistory" class="bg-white p-6 rounded-lg shadow-md text-lg">
+    <!-- New section to display the user's original prompt -->
+    <div id="originalPrompt" class="bg-gray-200 p-4 rounded-lg shadow-md mb-6 text-lg">
+        <p><b><span id="outputFormatText"></span>:&nbsp;</b><span id="promptText"></span></p>
+    </div>
+    <p id="twistedHistory" class="bg-white p-4 rounded-lg shadow-md mb-6 text-lg">
       <!-- The generated content will be displayed here -->
     </p>
     <div class="mt-8">
@@ -35,7 +39,7 @@
   <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
     <div class="bg-white p-8 w-full max-w-lg mx-auto rounded">
       <h2 class="text-2xl font-bold mb-4">About</h2>
-      <p>Twist history with History Twister, powered by AI.</p>
+      <p>AI-powered alternative history: Explore headlines, first-hand accounts, and more!</p>
       <button id="closeModal" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Close</button>
     </div>
   </div>
@@ -57,6 +61,11 @@
       })
       .then(data => {
         fetchedData = data; // Assign the fetched data to the variable
+
+        // Populate the original prompt section
+        document.getElementById('promptText').textContent = fetchedData.originalPrompt;
+        document.getElementById('outputFormatText').textContent = fetchedData.outputFormat;
+
         // Insert the fetched content into the "twistedHistory" element
         document.getElementById('twistedHistory').innerHTML = data.content.replace(/\n/g, '<br>');
       })

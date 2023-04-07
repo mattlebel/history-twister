@@ -17,16 +17,24 @@
 
     <div class="container mx-auto px-4 py-16">
         <h1 class="text-5xl font-bold mb-6">History Twister</h1>
-        <p class="text-xl mb-8">Twist history and read newspaper headlines, first-hand accounts, and more!</p>
+        <p class="text-xl mb-8">AI-powered alternative history: Explore headlines, first-hand accounts, and more!</p>
         <div class="mb-6">
-            <input type="text" placeholder="Enter your desired twisted history..." class="w-full p-4 bg-white rounded-lg shadow-md text-lg mb-4">
+            <label for="prompt" class="block text-lg mb-2">Imagine if...</label>
+            <textarea
+              name="prompt"
+              id="prompt"
+              class="form-control w-full p-4 bg-white rounded-lg shadow-md text-lg mb-4"
+              rows="5"
+              placeholder="US Navy intelligence was able to thwart the attack on Pearl Harbor a week before the attack"
+              required
+            ></textarea>
             <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
             <select id="outputFormat" class="w-full p-4 bg-white rounded-lg shadow-md text-lg">
-                <option value="newspaper">As a newspaper article</option>
-                <option value="diary">As a diary entry</option>
-                <option value="essay">As a short essay</option>
+                <option value="newspaper article">As a newspaper article</option>
+                <option value="diary entry">As a diary entry</option>
+                <option value="short essay">As a short essay</option>
                 <option value="speech">As a speech transcript</option>
-                <option value="interview">As an interview</option>
+                <option value="interview transcript">As an interview</option>
             </select>
         </div>
         <button id="twistHistoryButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
@@ -63,7 +71,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const twistHistoryButton = document.getElementById('twistHistoryButton');
             const examplePrompts = document.querySelectorAll('.example-prompt');
-            const inputBox = document.querySelector('input');
+            const inputBox = document.getElementById('prompt');
             const outputFormatSelect = document.querySelector('#outputFormat');
 
             twistHistoryButton.addEventListener('click', handleTwistHistory);

@@ -31,14 +31,19 @@ app.post('/api/generate', async (req, res) => {
         return res.status(400).json({ error: 'Invalid input' });
     }
 
+    // Generate a user GUID
+    const userGuid = generateGuid();
+
     try {
         const response = await openai.createCompletion({
             model: 'text-davinci-003',
-            prompt: `Imagine a ${outputFormat} about ${prompt}`,
+            prompt: `You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed ${outputFormat} based on the following alternative history scenario: ${prompt}. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills. NEVER REFERENCE THE FOLLOWING EXAMPLE IN YOUR RESPONSE. Example: If the prompt you get says "Time Travel Discovered Day After US Loses World War II" you should write in a tense that indicates that it is the day after World War II ends.`,
             max_tokens: 2048,
             n: 1,
             stop: null,
-            temperature: 0.8,
+            best_of: 3,
+            temperature: 0.5,
+            user: userGuid,
         });
 
         const result = response.data.choices[0].text.trim();
@@ -47,7 +52,7 @@ app.post('/api/generate', async (req, res) => {
         console.log(result);
 
         // Save the result and GUID to the database
-        db.run('INSERT INTO twisted_history (guid, content, original_prompt) VALUES (?, ?, ?)', [guid, result, prompt], (error) => {
+        db.run('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES (?, ?, ?, ?, ?)', [guid, result, prompt, outputFormat, userGuid], (error) => {
             if (error) {
                 console.error('Error saving to the database:', error);
                 return res.status(500).json({ error: 'Failed to save twisted history' });
@@ -76,7 +81,7 @@ app.get('/twist/:guid', (req, res) => {
   const { guid } = req.params;
 
   // Retrieve the result associated with the given GUID from the database
-  db.get('SELECT content FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
+  db.get('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
     if (error) {
       console.error('Error retrieving from the database:', error);
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
@@ -87,14 +92,14 @@ app.get('/twist/:guid', (req, res) => {
     }
 
     // Send the twisted history content as a JSON object
-    res.json({ content: row.content });
+    res.json({ content: row.content, outputFormat: row.output_format, originalPrompt: row.original_prompt });
   });
 });
 
 app.post('/api/twist_again/:guid', async (req, res) => {
   const { guid } = req.params;
 
-  db.get('SELECT original_prompt, outputFormat FROM twisted_history WHERE guid = ?', [guid], async (error, row) => {
+  db.get('SELECT original_prompt, outputFormat, user_guid FROM twisted_history WHERE guid = ?', [guid], async (error, row) => {
     if (error) {
       console.error('Error retrieving from the database:', error);
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
@@ -104,28 +109,33 @@ app.post('/api/twist_again/:guid', async (req, res) => {
       return res.status(404).json({ error: 'Twisted history not found' });
     }
 
-    const { original_prompt, outputFormat } = row;
+    const { original_prompt: originalPrompt, output_format: outputFormat, user_guid: userGuid } = row;
 
     try {
       const response = await openai.createCompletion({
         model: 'text-davinci-003',
-        prompt: `Imagine a ${outputFormat} about ${original_prompt}`,
+        prompt: `You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed ${outputFormat} based on the following alternative history scenario: ${prompt}. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills. NEVER REFERENCE THE FOLLOWING EXAMPLE IN YOUR RESPONSE. Example: If the prompt you get says "Time Travel Discovered Day After US Loses World War II" you should write in a tense that indicates that it is the day after World War II ends.`,
         max_tokens: 2048,
         n: 1,
         stop: null,
-        temperature: 0.8,
+        best_of: 3,
+        temperature: 0.5,
+        user: userGuid,
       });
 
       const result = response.data.choices[0].text.trim();
       const newGuid = generateGuid();
 
-      db.run('INSERT INTO twisted_history (guid, content, original_prompt) VALUES (?, ?, ?)', [newGuid, result, original_prompt], (error) => {
-        if (error) {
-          console.error('Error saving to the database:', error);
-          return res.status(500).json({ error: 'Failed to save twisted history' });
-        }
+      db.run(
+        'INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES (?, ?, ?, ?, ?)',
+        [newGuid, result, original_prompt, outputFormat, user_guid],
+        (error) => {
+            if (error) {
+              console.error('Error saving to the database:', error);
+              return res.status(500).json({ error: 'Failed to save twisted history' });
+            }
 
-        res.json({ guid: newGuid, result });
+            res.json({ guid: newGuid, result });
       });
 
     } catch (error) {
