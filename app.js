@@ -73,21 +73,21 @@ function generateGuid() {
 }
 
 app.get('/twist/:guid', (req, res) => {
-    const { guid } = req.params;
+  const { guid } = req.params;
 
   // Retrieve the result associated with the given GUID from the database
   db.get('SELECT content FROM twisted_history WHERE guid = ?', [guid], (error, row) => {
-      if (error) {
-          console.error('Error retrieving from the database:', error);
-          return res.status(500).json({ error: 'Failed to retrieve twisted history' });
-      }
+    if (error) {
+      console.error('Error retrieving from the database:', error);
+      return res.status(500).json({ error: 'Failed to retrieve twisted history' });
+    }
 
-      if (!row) {
-          return res.status(404).json({ error: 'Twisted history not found' });
-      }
+    if (!row) {
+      return res.status(404).json({ error: 'Twisted history not found' });
+    }
 
-      // Render the Results page with the retrieved content
-      res.sendFile(path.join(__dirname, '../public', 'results.html'));
+    // Send the twisted history content as a JSON object
+    res.json({ content: row.content });
   });
 });
 

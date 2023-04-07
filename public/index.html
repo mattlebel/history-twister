@@ -94,7 +94,7 @@
                     document.getElementById('loading').classList.add('hidden');
 
                     // Redirect to the results page
-                    window.location.href = `/twist/${data.guid}`;
+                    window.location.href = `/results.html?twist=${data.guid}`;
                 } catch (error) {
                     alert('An error occurred. Please try again.');
                     console.error(error);

@@ -16,14 +16,26 @@
     </p>
   </div>
   <script>
-    // Retrieve the GUID from the URL
-    const guid = location.pathname.split('/').pop();
+    // Retrieve the GUID from the query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const guid = urlParams.get('twist');
 
-    // Fetch the generated content associated with the GUID from the backend (not implemented here)
-    // ...
-
-    // Insert the fetched content into the "twistedHistory" element
-    document.getElementById('twistedHistory').textContent = 'Fetched content goes here';
+    // Fetch the generated content associated with the GUID from the sqlite database
+    fetch(`/twist/${guid}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching twisted history');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Insert the fetched content into the "twistedHistory" element
+        document.getElementById('twistedHistory').textContent = data.content;
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById('twistedHistory').textContent = 'Error fetching twisted history';
+      });
   </script>
 </body>
 </html>
