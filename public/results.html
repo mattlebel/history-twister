@@ -85,7 +85,7 @@
       document.getElementById('emailShare').addEventListener('click', (event) => {
         event.preventDefault();
         const subject = encodeURIComponent('Check out this twisted history!');
-        const body = encodeURIComponent(`${fetchedData.content}\n\nView online and make your own twisted history: ${window.location.href}`);
+        const body = encodeURIComponent(`I used AI on HistoryTwister.com to make a ${fetchedData.outputFormat}: ${fetchedData.originalPrompt}\n\nHere's what happened:\n----\n\n${fetchedData.content}\n\n----\nView online and make your own twisted history: ${window.location.href}`);
         window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
       });
 
