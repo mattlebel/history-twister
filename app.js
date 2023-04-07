@@ -128,12 +128,14 @@ app.get('/twist/:guid', (req, res) => {
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
     }
 
-    if (!result || result.length === 0) {
+    const rows = result.rows || result; // Add this line
+
+    if (!rows || rows.length === 0) {
       return res.status(404).json({ error: 'Twisted history not found' });
     }
 
     // Extract the row data from the result
-    const row = result[0]; // Update this line
+    const row = rows[0]; // Update this line
 
     // Send the twisted history content as a JSON object
     res.json({ content: row.content, outputFormat: row.output_format, originalPrompt: row.original_prompt });
