@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { Configuration, OpenAIApi } = require('openai');
+const cookieParser = require('cookie-parser');
 
 const db = new sqlite3.Database('./history-twister.db');
 
@@ -21,6 +22,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(cookieParser());
 
 // API endpoint for generating twisted history
 app.post('/api/generate', async (req, res) => {
@@ -31,8 +33,12 @@ app.post('/api/generate', async (req, res) => {
         return res.status(400).json({ error: 'Invalid input' });
     }
 
-    // Generate a user GUID
-    const userGuid = generateGuid();
+    // Check for an existing user GUID in the cookies, otherwise generate a new one
+    let userGuid = req.cookies.userGuid;
+    if (!userGuid) {
+        userGuid = generateGuid();
+        res.cookie('userGuid', userGuid, { maxAge: 30 * 24 * 60 * 60 * 1000 }); // Set cookie expiration to 30 days
+    }
 
     try {
         const response = await openai.createCompletion({
