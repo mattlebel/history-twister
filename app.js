@@ -35,7 +35,7 @@ app.post('/api/generate', async (req, res) => {
         const response = await openai.createCompletion({
             model: 'text-davinci-003',
             prompt: `Imagine a ${outputFormat} about ${prompt}`,
-            max_tokens: 500,
+            max_tokens: 2048,
             n: 1,
             stop: null,
             temperature: 0.8,
@@ -47,7 +47,7 @@ app.post('/api/generate', async (req, res) => {
         console.log(result);
 
         // Save the result and GUID to the database
-        db.run('INSERT INTO twisted_history (guid, content) VALUES (?, ?)', [guid, result], (error) => {
+        db.run('INSERT INTO twisted_history (guid, content, original_prompt) VALUES (?, ?, ?)', [guid, result, prompt], (error) => {
             if (error) {
                 console.error('Error saving to the database:', error);
                 return res.status(500).json({ error: 'Failed to save twisted history' });
@@ -90,6 +90,65 @@ app.get('/twist/:guid', (req, res) => {
     res.json({ content: row.content });
   });
 });
+
+app.post('/api/twist_again/:guid', async (req, res) => {
+  const { guid } = req.params;
+
+  db.get('SELECT original_prompt, outputFormat FROM twisted_history WHERE guid = ?', [guid], async (error, row) => {
+    if (error) {
+      console.error('Error retrieving from the database:', error);
+      return res.status(500).json({ error: 'Failed to retrieve twisted history' });
+    }
+
+    if (!row) {
+      return res.status(404).json({ error: 'Twisted history not found' });
+    }
+
+    const { original_prompt, outputFormat } = row;
+
+    try {
+      const response = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt: `Imagine a ${outputFormat} about ${original_prompt}`,
+        max_tokens: 2048,
+        n: 1,
+        stop: null,
+        temperature: 0.8,
+      });
+
+      const result = response.data.choices[0].text.trim();
+      const newGuid = generateGuid();
+
+      db.run('INSERT INTO twisted_history (guid, content, original_prompt) VALUES (?, ?, ?)', [newGuid, result, original_prompt], (error) => {
+        if (error) {
+          console.error('Error saving to the database:', error);
+          return res.status(500).json({ error: 'Failed to save twisted history' });
+        }
+
+        res.json({ guid: newGuid, result });
+      });
+
+    } catch (error) {
+      console.error('Error during API request:', error.message);
+      console.error('Error details:', error);
+      console.error('Request data:', { original_prompt, outputFormat });
+      res.status(500).json({ error: 'Failed to generate twisted history' });
+    }
+  });
+});
+
+
+app.get('/api/twisted_history', (req, res) => {
+    db.all('SELECT * FROM twisted_history', [], (error, rows) => {
+        if (error) {
+            console.error('Error retrieving from the database:', error);
+            return res.status(500).json({ error: 'Failed to retrieve twisted history entries' });
+        }
+
+        res.json(rows);
+    });
+});
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

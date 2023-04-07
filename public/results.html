@@ -9,16 +9,43 @@
   <meta name="robots" content="noindex">
 </head>
 <body class="bg-gray-100">
+  <header class="bg-blue-600 p-4">
+    <nav class="container mx-auto flex justify-between items-center">
+      <a href="/" class="text-white font-bold text-2xl">History Twister</a>
+      <button id="aboutButton" class="text-white font-bold">About</button>
+    </nav>
+  </header>
+
   <div class="container mx-auto py-12">
-    <h1 class="text-4xl font-bold mb-4">Twisted History Results</h1>
+    <h1 class="text-4xl font-bold mb-4">Your Twisted History:</h1>
     <p id="twistedHistory" class="bg-white p-6 rounded-lg shadow-md text-lg">
       <!-- The generated content will be displayed here -->
     </p>
+    <div class="mt-8">
+      <button id="twistAgain" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 mr-4 rounded-lg">Twist It Again</button>
+      <a href="/" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg">Start Over</a>
+    </div>
+    <div class="share mt-4">
+      <h3 class="text-xl mb-2">Share:</h3>
+      <a id="emailShare" href="#" class="mr-4">Email</a>
+      <a id="twitterShare" href="#" target="_blank">Twitter</a>
+    </div>
   </div>
+
+  <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-8 w-full max-w-lg mx-auto rounded">
+      <h2 class="text-2xl font-bold mb-4">About</h2>
+      <p>Twist history with History Twister, powered by AI.</p>
+      <button id="closeModal" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Close</button>
+    </div>
+  </div>
+
   <script>
     // Retrieve the GUID from the query parameters
     const urlParams = new URLSearchParams(window.location.search);
     const guid = urlParams.get('twist');
+
+    let fetchedData; // Declare a variable to store the fetched data
 
     // Fetch the generated content associated with the GUID from the sqlite database
     fetch(`/twist/${guid}`)
@@ -29,12 +56,60 @@
         return response.json();
       })
       .then(data => {
+        fetchedData = data; // Assign the fetched data to the variable
         // Insert the fetched content into the "twistedHistory" element
-        document.getElementById('twistedHistory').textContent = data.content;
+        document.getElementById('twistedHistory').innerHTML = data.content.replace(/\n/g, '<br>');
       })
       .catch(error => {
         console.error(error);
         document.getElementById('twistedHistory').textContent = 'Error fetching twisted history';
+      });
+
+      document.getElementById('aboutButton').addEventListener('click', () => {
+        document.getElementById('aboutModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeModal').addEventListener('click', () => {
+        document.getElementById('aboutModal').classList.add('hidden');
+      });
+
+      document.getElementById('emailShare').addEventListener('click', (event) => {
+        event.preventDefault();
+        const subject = encodeURIComponent('Check out this twisted history!');
+        const body = encodeURIComponent(`${fetchedData.content}\n\nView online and make your own twisted history: ${window.location.href}`);
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+      });
+
+      document.getElementById('twitterShare').addEventListener('click', (event) => {
+        event.preventDefault();
+        const text = encodeURIComponent(`Check out this twisted history: ${window.location.href}`);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+      });
+
+      document.getElementById('twistAgain').addEventListener('click', async () => {
+        const apiUrl = '/api/generate'; // Replace with your API endpoint
+        const prompt = localStorage.getItem('previousPrompt');
+        const outputFormat = localStorage.getItem('previousOutputFormat');
+
+        if (prompt && outputFormat) {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt, outputFormat })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            window.location.href = `/results.html?twist=${data.guid}`;
+          } else {
+            alert('An error occurred. Please try again.');
+          }
+        } else {
+          alert('No previous prompt found. Please start over.');
+          window.location.href = '/';
+        }
       });
   </script>
 </body>

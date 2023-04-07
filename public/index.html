@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-600 p-4">
+      <nav class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-white font-bold text-2xl">History Twister</a>
+        <button id="aboutButton" class="text-white font-bold">About</button>
+      </nav>
+    </header>
+
     <div class="container mx-auto px-4 py-16">
         <h1 class="text-5xl font-bold mb-6">History Twister</h1>
         <p class="text-xl mb-8">Twist history and read newspaper headlines, first-hand accounts, and more!</p>
@@ -22,7 +29,7 @@
                 <option value="interview">As an interview</option>
             </select>
         </div>
-        <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
+        <button id="twistHistoryButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
 
         <div class="mt-10">
             <h2 class="text-2xl font-semibold mb-4">Example Prompts:</h2>
@@ -44,9 +51,17 @@
         </div>
     </div>
 
+    <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+      <div class="bg-white p-8 w-full max-w-lg mx-auto rounded">
+        <h2 class="text-2xl font-bold mb-4">About</h2>
+        <p>Twist history with History Twister, powered by AI.</p>
+        <button id="closeModal" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Close</button>
+      </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const twistHistoryButton = document.querySelector('button');
+            const twistHistoryButton = document.getElementById('twistHistoryButton');
             const examplePrompts = document.querySelectorAll('.example-prompt');
             const inputBox = document.querySelector('input');
             const outputFormatSelect = document.querySelector('#outputFormat');
@@ -103,8 +118,14 @@
                     document.getElementById('loading').classList.add('hidden');
                 }
             }
+            document.getElementById('aboutButton').addEventListener('click', () => {
+              document.getElementById('aboutModal').classList.remove('hidden');
+            });
+
+            document.getElementById('closeModal').addEventListener('click', () => {
+              document.getElementById('aboutModal').classList.add('hidden');
+            });
         });
     </script>
-
 </body>
 </html>
