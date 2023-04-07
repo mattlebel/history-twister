@@ -8,6 +8,26 @@ const cookieParser = require('cookie-parser');
 
 const db = require('./dbConfig');
 
+const createTableQuery = `
+  CREATE TABLE IF NOT EXISTS twisted_history (
+    id SERIAL PRIMARY KEY,
+    guid UUID UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    original_prompt TEXT NOT NULL,
+    output_format VARCHAR(255) NOT NULL,
+    user_guid UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  );
+`;
+
+db.query(createTableQuery, (err, res) => {
+  if (err) {
+    console.error('Error creating table:', err);
+  } else {
+    console.log('Table created or already exists');
+  }
+});
+
 // Load environment variables
 dotenv.config();
 
