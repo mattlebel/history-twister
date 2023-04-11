@@ -5,34 +5,23 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { Configuration, OpenAIApi } = require('openai');
 const cookieParser = require('cookie-parser');
+const { v4: uuidv4 } = require('uuid');
 
 const db = require('./dbConfig');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const createTableQuery = isProduction
-  ? `
-    CREATE TABLE IF NOT EXISTS twisted_history (
-      id SERIAL PRIMARY KEY,
-      guid UUID UNIQUE NOT NULL,
-      content TEXT NOT NULL,
-      original_prompt TEXT NOT NULL,
-      output_format VARCHAR(255) NOT NULL,
-      user_guid UUID NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    );
-  `
-  : `
-    CREATE TABLE IF NOT EXISTS twisted_history (
-      id INTEGER PRIMARY KEY,
-      guid TEXT UNIQUE NOT NULL,
-      content TEXT NOT NULL,
-      original_prompt TEXT NOT NULL,
-      output_format TEXT NOT NULL,
-      user_guid TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+const createTableQuery = `
+  CREATE TABLE IF NOT EXISTS twisted_history (
+    id ${isProduction ? 'SERIAL' : 'INTEGER'} PRIMARY KEY,
+    guid ${isProduction ? 'UUID' : 'TEXT'} UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    original_prompt TEXT NOT NULL,
+    output_format ${isProduction ? 'VARCHAR(255)' : 'TEXT'} NOT NULL,
+    user_guid ${isProduction ? 'UUID' : 'TEXT'} NOT NULL,
+    created_at ${isProduction ? 'TIMESTAMPTZ DEFAULT NOW()' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+  );
+`;
 
 
 db.query(createTableQuery, (err, res) => {
@@ -111,11 +100,7 @@ app.post('/api/generate', async (req, res) => {
 });
 
 function generateGuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0,
-            v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+  return uuidv4(); // Update this line
 }
 
 app.get('/twist/:guid', (req, res) => {
