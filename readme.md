@@ -2,7 +2,17 @@
 
 **This app was written, debugged, and deployed entirely by ChatGPT (GPT-4) in April 2023.**
 
+Production demo URL: [https://historytwister.com](https://historytwister.com)
+
 Twist history with History Twister, powered by AI. This application uses the OpenAI API to generate creative, alternative versions of historical events based on user prompts.
+
+---
+
+Here's an example:
+
+> Newspaper article: It's a day after the United States has surrendered to Axis powers and lost World War 2. Citizens are being instructed to report to their respective internment camps.
+
+**Result:** [https://historytwister.com/results.html?twist=63af0cbc-8bc6-4dff-98c8-d88c2c61cd2f](https://historytwister.com/results.html?twist=63af0cbc-8bc6-4dff-98c8-d88c2c61cd2f)
 
 ## Features
 
@@ -66,7 +76,7 @@ For local development, this application uses SQLite. For production, it uses Pos
 
 3. Via the Heroku dashboard, add the Heroku PostgreSQL add-on
 
-4. Via the Heroku dashboard, set your OpenAI API key and `NODE_ENV` as a Heroku environment variables
+4. Via the Heroku dashboard, set your OpenAI API key and `NODE_ENV` as Heroku environment variables
 
 5. Deploy your application to Heroku:
 
