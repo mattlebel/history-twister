@@ -68,10 +68,9 @@ app.post('/api/generate', async (req, res) => {
         const response = await openai.createCompletion({
             model: 'text-davinci-003',
             prompt: `You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed ${outputFormat} based on the following alternative history scenario: ${prompt}. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills.`,
-            max_tokens: 2048,
+            max_tokens: 1024,
             n: 1,
             stop: null,
-            best_of: 3,
             temperature: 0.5,
             user: userGuid,
         });
