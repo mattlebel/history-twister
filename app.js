@@ -72,6 +72,7 @@ app.post('/api/generate', async (req, res) => {
             n: 1,
             stop: null,
             temperature: 0.5,
+            frequency_penalty: 0.9,
             user: userGuid,
         });
 
