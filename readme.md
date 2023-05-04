@@ -23,7 +23,7 @@ Here's an example:
 
 ## Good to know
 
-Heads up that the hosted version has been hitting some API soft cap limits from public usage, so I updated the `max_tokens` value in the [prompt]() to be 300 (about 225 words) in early May 2023.
+Heads up that the hosted version has been hitting some API soft cap limits from public usage, so I updated the `max_tokens` value in the [prompt](https://github.com/mattlebel/history-twister/blob/main/app.js#L77-L85) to be 300 (about 225 words) in early May 2023.
 
 If you're running this locally, you will get more interesting results if you adjust your `max_tokens` value to be 1024 (or similar).
 
