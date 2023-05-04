@@ -21,7 +21,7 @@
     <header class="bg-blue-600 p-4">
       <nav class="container mx-auto flex justify-between items-center">
         <a href="/" class="text-white font-bold text-2xl">History Twister</a>
-        <button id="aboutButton" class="text-white font-bold">About</button>
+        <button id="aboutButton" class="text-white font-bold" type="button">About</button>
       </nav>
     </header>
 
@@ -41,13 +41,13 @@
             ></textarea>
             <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
             <div id="outputFormat" class="flex flex-wrap sm:space-x-2 mb-4 pill-buttons">
-                <button class="output-option bg-blue-500 text-white rounded-full px-4 py-2 focus:outline-none pill-button selected" data-value="newspaper article">As a newspaper article</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="tweet storm">As a tweet storm</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="diary entry">As a diary entry</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="short essay">As a short essay</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="speech">As a speech transcript</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="hot take">As a podcast intro</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="interview transcript">As an interview</button>
+                <button class="output-option bg-blue-500 text-white rounded-full px-4 py-2 focus:outline-none pill-button selected" type="button" data-value="newspaper article">As a newspaper article</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="tweet storm">As a tweet storm</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="diary entry">As a diary entry</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="short essay">As a short essay</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="speech">As a speech transcript</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="hot take">As a podcast intro</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="interview transcript">As an interview</button>
             </div>
         </div>
         <p id="error-message" class="text-red-500 font-semibold mb-4 hidden"></p>
