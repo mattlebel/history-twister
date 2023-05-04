@@ -50,53 +50,55 @@ app.use(cookieParser());
 
 // API endpoint for generating twisted history
 app.post('/api/generate', async (req, res) => {
-    const { prompt, outputFormat } = req.body;
+  const { prompt, outputFormat } = req.body;
 
-    // Validate the request data
-    if (!prompt || !outputFormat) {
-        return res.status(400).json({ error: 'Invalid input' });
-    }
+  // Validate the request data
+  if (!prompt || !outputFormat) {
+    return res.status(400).json({ error: 'Invalid input' });
+  }
 
-    // Check for an existing user GUID in the cookies, otherwise generate a new one
-    let userGuid = req.cookies.userGuid;
-    if (!userGuid) {
-        userGuid = generateGuid();
-        res.cookie('userGuid', userGuid, { maxAge: 30 * 24 * 60 * 60 * 1000 }); // Set cookie expiration to 30 days
-    }
+  // Check for an existing user GUID in the cookies, otherwise generate a new one
+  let userGuid = req.cookies.userGuid;
+  if (!userGuid) {
+    userGuid = generateGuid();
+    res.cookie('userGuid', userGuid, { maxAge: 30 * 24 * 60 * 60 * 1000 }); // Set cookie expiration to 30 days
+  }
 
-    try {
-        const response = await openai.createCompletion({
-            model: 'text-davinci-003',
-            prompt: `You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed ${outputFormat} based on the following alternative history scenario: ${prompt}. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills.`,
-            max_tokens: 1024,
-            n: 1,
-            stop: null,
-            temperature: 0.5,
-            frequency_penalty: 0.9,
-            user: userGuid,
-        });
+  try {
+    // Replace the old API call with the new chat-based API call
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
+        { role: "user", content: `Create a ${outputFormat} based on the following alternative history scenario: ${prompt}` },
+      ],
+      temperature: 0.8,
+      // Set max token value here
+      max_tokens: 300,
+    });
 
-        const result = response.data.choices[0].text.trim();
-        const guid = generateGuid();
+    // Access the response
+    const result = response.data.choices[0].message.content.trim();
+    const guid = generateGuid();
 
-        console.log(result);
+    console.log(result);
 
-        // Save the result and GUID to the database
-        db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES ($1, $2, $3, $4, $5)', [guid, result, prompt, outputFormat, userGuid], (error) => {
-            if (error) {
-                console.error('Error saving to the database:', error);
-                return res.status(500).json({ error: 'Failed to save twisted history' });
-            }
+    // Save the result and GUID to the database
+    db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES ($1, $2, $3, $4, $5)', [guid, result, prompt, outputFormat, userGuid], (error) => {
+      if (error) {
+        console.error('Error saving to the database:', error);
+        return res.status(500).json({ error: 'Failed to save twisted history' });
+      }
 
-            res.json({ guid, result });
-        });
+      res.json({ guid, result });
+    });
 
-    } catch (error) {
-        console.error('Error during API request:', error.message);
-        console.error('Error details:', error);
-        console.error('Request data:', { prompt, outputFormat });
-        res.status(500).json({ error: 'Failed to generate twisted history' });
-    }
+  } catch (error) {
+    console.error('Error during API request:', error.message);
+    console.error('Error details:', error);
+    console.error('Request data:', { prompt, outputFormat });
+    res.status(500).json({ error: 'Failed to generate twisted history' });
+  }
 });
 
 function generateGuid() {

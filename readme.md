@@ -21,6 +21,27 @@ Here's an example:
 - Share twisted history via Email and Twitter with unique result URLs
 - CTA buttons to twist history again or start over
 
+## Good to know
+
+Heads up that the hosted version has been hitting some API soft cap limits from public usage, so I updated the `max_tokens` value in the [prompt]() to be 300 (about 225 words) in early May 2023.
+
+If you're running this locally, you will get more interesting results if you adjust your `max_tokens` value to be 1024 (or similar).
+
+In `app.js`:
+
+```javaScript
+const response = await openai.createChatCompletion({
+  model: "gpt-3.5-turbo",
+  messages: [
+    { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
+    { role: "user", content: `Create a ${outputFormat} based on the following alternative history scenario: ${prompt}` },
+  ],
+  temperature: 0.8,
+  // Set max token value here
+  max_tokens: 300,
+});
+```
+
 ## Getting Started
 
 ### Prerequisites
