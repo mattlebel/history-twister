@@ -6,6 +6,7 @@ const path = require('path');
 const { Configuration, OpenAIApi } = require('openai');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
+const rateLimit = require('express-rate-limit');
 
 const db = require('./dbConfig');
 
@@ -40,6 +41,12 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const generateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 requests per windowMs
+  message: 'Too many requests. Please try again later.',
+});
+
 const app = express();
 
 // Middlewares
@@ -47,6 +54,7 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cookieParser());
+app.use('/api/generate', generateLimiter);
 
 // API endpoint for generating twisted history
 app.post('/api/generate', async (req, res) => {
@@ -97,7 +105,12 @@ app.post('/api/generate', async (req, res) => {
     console.error('Error during API request:', error.message);
     console.error('Error details:', error);
     console.error('Request data:', { prompt, outputFormat });
-    res.status(500).json({ error: 'Failed to generate twisted history' });
+
+    if (error.response && error.response.status === 429) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    } else {
+      res.status(500).json({ error: 'Failed to generate Twisted History. API limits reached.' });
+    }
   }
 });
 
