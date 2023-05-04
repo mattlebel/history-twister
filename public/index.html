@@ -40,15 +40,15 @@
               autofocus
             ></textarea>
             <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
-            <select id="outputFormat" class="w-full p-4 bg-white rounded-lg shadow-md text-lg">
-                <option value="newspaper article">As a newspaper article</option>
-                <option value="tweet storm">As a tweet storm</option>
-                <option value="diary entry">As a diary entry</option>
-                <option value="short essay">As a short essay</option>
-                <option value="speech">As a speech transcript</option>
-                <option value="hot take">As a podcast intro</option>
-                <option value="interview transcript">As an interview</option>
-            </select>
+            <div id="outputFormat" class="flex flex-wrap sm:space-x-2 mb-4 pill-buttons">
+                <button class="output-option bg-blue-500 text-white rounded-full px-4 py-2 focus:outline-none pill-button selected" data-value="newspaper article">As a newspaper article</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="tweet storm">As a tweet storm</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="diary entry">As a diary entry</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="short essay">As a short essay</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="speech">As a speech transcript</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="hot take">As a podcast intro</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" data-value="interview transcript">As an interview</button>
+            </div>
         </div>
         <p id="error-message" class="text-red-500 font-semibold mb-4 hidden"></p>
         <button id="twistHistoryButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
@@ -103,9 +103,28 @@
                 });
             });
 
+            // Add this event listener to handle pill button clicks
+            document.querySelectorAll('.output-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Deselect other buttons
+                    document.querySelectorAll('.output-option').forEach(opt => {
+                        opt.classList.remove('bg-blue-500');
+                        opt.classList.add('bg-gray-300');
+                        opt.classList.remove('text-white');
+                        opt.classList.add('text-black');
+                    });
+
+                    // Select the clicked button
+                    option.classList.add('bg-blue-500');
+                    option.classList.remove('bg-gray-300');
+                    option.classList.add('text-white');
+                    option.classList.remove('text-black');
+                });
+            });
+
             async function handleTwistHistory() {
                 const promptText = inputBox.value.trim();
-                const outputFormat = outputFormatSelect.value;
+                const outputFormat = document.querySelector('.output-option.bg-blue-500').dataset.value;
                 const errorMessage = document.getElementById('error-message');
 
                 if (!promptText) {

@@ -23,3 +23,29 @@
   background-color: #93C5FD;
   cursor: not-allowed;
 }
+
+.pill-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pill-button {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .pill-buttons {
+    margin-top: 10px;
+  }
+
+  .pill-button {
+    font-size: 16px;
+  }
+}
