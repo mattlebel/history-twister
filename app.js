@@ -78,11 +78,12 @@ app.post('/api/generate', async (req, res) => {
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this event would have unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
-        { role: "user", content: `Create an ~200 word ${outputFormat} based on the following alternative history scenario: ${prompt}` },
+        { role: "user", content: `Create a 200-400 word ${outputFormat} based on the following alternative history scenario: ${prompt}` },
       ],
       temperature: 0.8,
       // Set max token value here
-      max_tokens: 300,
+      max_tokens: 500,
+      stream: true,
     });
 
     // Access the response
