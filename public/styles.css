@@ -18,3 +18,8 @@
     transform: rotate(360deg);
   }
 }
+
+.loading-btn {
+  background-color: #93C5FD;
+  cursor: not-allowed;
+}

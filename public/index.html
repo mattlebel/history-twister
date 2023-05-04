@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
     <title>History Twister</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -37,16 +37,20 @@
               rows="5"
               placeholder="US Navy intelligence was able to thwart the attack on Pearl Harbor a week before the attack"
               required
+              autofocus
             ></textarea>
             <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
             <select id="outputFormat" class="w-full p-4 bg-white rounded-lg shadow-md text-lg">
                 <option value="newspaper article">As a newspaper article</option>
+                <option value="tweet storm">As a tweet storm</option>
                 <option value="diary entry">As a diary entry</option>
                 <option value="short essay">As a short essay</option>
                 <option value="speech">As a speech transcript</option>
+                <option value="hot take">As a podcast intro</option>
                 <option value="interview transcript">As an interview</option>
             </select>
         </div>
+        <p id="error-message" class="text-red-500 font-semibold mb-4 hidden"></p>
         <button id="twistHistoryButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Twist History</button>
 
         <div class="mt-10">
@@ -102,10 +106,14 @@
             async function handleTwistHistory() {
                 const promptText = inputBox.value.trim();
                 const outputFormat = outputFormatSelect.value;
+                const errorMessage = document.getElementById('error-message');
 
                 if (!promptText) {
-                    alert('Please enter a twisted history scenario.');
+                    errorMessage.textContent = 'Please enter a twisted history scenario above.';
+                    errorMessage.classList.remove('hidden');
                     return;
+                } else {
+                    errorMessage.classList.add('hidden');
                 }
 
                 console.log('Submitting prompt:', promptText, 'with output format:', outputFormat);
@@ -141,6 +149,19 @@
                     document.getElementById('loading').classList.add('hidden');
                 }
             }
+
+            // Disable the "Twist History" button and show a loading message when it is clicked
+            twistHistoryButton.addEventListener('click', () => {
+              twistHistoryButton.disabled = true;
+              twistHistoryButton.textContent = 'Loading...';
+            });
+
+            // Re-enable the "Twist History" button and reset its text when the loading message is hidden
+            document.getElementById('loading').addEventListener('transitionend', () => {
+              twistHistoryButton.disabled = false;
+              twistHistoryButton.textContent = 'Twist History';
+            });
+
             document.getElementById('aboutButton').addEventListener('click', () => {
               document.getElementById('aboutModal').classList.remove('hidden');
             });
