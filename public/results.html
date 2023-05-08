@@ -6,7 +6,21 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <title>Results | History Twister</title>
+  <meta name="description" content="Generate historical fiction with History Twister, powered by AI.">
   <meta name="robots" content="noindex">
+
+  <!-- Open Graph metadata -->
+  <meta property="og:title" content="Check out this twisted history from HistoryTwister.com" id="ogTitle">
+  <meta property="og:description" content="" id="ogDescription">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://historytwister.com">
+  <meta property="og:image" content="historyTwister.jpg">
+
+  <!-- Twitter Card metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Check out this twisted history from HistoryTwister.com" id="twitterTitle">
+  <meta name="twitter:description" content="" id="twitterDescription">
+  <meta name="twitter:image" content="historyTwister.jpg">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4K2QSHYCFF"></script>
@@ -89,6 +103,10 @@
         // Populate the original prompt section
         document.getElementById('promptText').textContent = fetchedData.originalPrompt;
         document.getElementById('outputFormatText').textContent = fetchedData.outputFormat;
+
+        // Set dynamic description for Open Graph and Twitter metadata
+        document.getElementById('ogDescription').setAttribute('content', fetchedData.originalPrompt);
+        document.getElementById('twitterDescription').setAttribute('content', fetchedData.originalPrompt);
 
         // Insert the fetched content into the "twistedHistory" element
         document.getElementById('twistedHistory').innerHTML = data.content.replace(/\n/g, '<br>');

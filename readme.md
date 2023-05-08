@@ -1,10 +1,12 @@
 # History Twister
 
+![History Twister image](/public/historyTwister.jpg)
+
 **This app was written, debugged, and deployed entirely by ChatGPT (GPT-4) in April 2023.**
 
 Production demo URL: [https://historytwister.com](https://historytwister.com)
 
-Twist history with History Twister, powered by AI. This application uses the OpenAI API to generate creative, alternative versions of historical events based on user prompts.
+Generate historical fiction with History Twister, powered by AI. This application uses the OpenAI API to generate creative, alternative versions of historical events based on user prompts.
 
 ---
 
