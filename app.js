@@ -78,10 +78,11 @@ app.post('/api/generate', async (req, res) => {
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this fictional event has unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
-        { role: "user", content: `Create an ~200 word ${outputFormat} based on the following alternative history scenario: ${prompt}` },
+        { role: "user", content: `Craft a 500 word creative writing piece based on the following alternative history scenario: ${prompt}.` },
       ],
+      n: 3,
       temperature: 0.8,
-      max_tokens: 400,
+      max_tokens: 1000,
     });
 
     // NEW: Extract the "creative" response
@@ -91,11 +92,11 @@ app.post('/api/generate', async (req, res) => {
     const correctiveResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are an AI with the role of correcting and improving the historical narrative given to you. Your task is to review the document below and make any necessary corrections to enhance its accuracy and engagement." },
+        { role: "system", content: "Rewrite the results of the creative writing into a compelling ${outputFormat}." },
         { role: "user", content: creativeResult },
       ],
       temperature: 0.6,
-      max_tokens: 400,
+      max_tokens: 1000,
     });
 
     // NEW: Extract the "corrective" response
