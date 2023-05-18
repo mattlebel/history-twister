@@ -19,6 +19,7 @@ const createTableQuery = `
     content TEXT NOT NULL,
     original_prompt TEXT NOT NULL,
     output_format ${isProduction ? 'VARCHAR(255)' : 'TEXT'} NOT NULL,
+    image_url TEXT NOT NULL,
     user_guid ${isProduction ? 'UUID' : 'TEXT'} NOT NULL,
     created_at ${isProduction ? 'TIMESTAMPTZ DEFAULT NOW()' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
   );
@@ -56,6 +57,29 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cookieParser());
 app.use('/api/generate', generateLimiter);
 
+// API endpoint to generate AI image
+const createImage = async (prompt) => {
+  try {
+    const response = await openai.createImage({
+      prompt: prompt,
+      n: 1,
+      size: "512x512",
+    });
+
+    if (response.data) {
+      console.log('Image generated successfully:', response.data.data[0].url);
+      return response.data.data[0].url;
+    } else {
+      console.log('No image generated, using default image');
+      return '/path/to/default/image-not-generated.jpg'; // update this to your default image URL
+    }
+  } catch (error) {
+    console.error('Failed to generate image:', error);
+    console.log(error);
+    return '/path/to/default/image-failed.jpg'; // update this to your default image URL
+  }
+};
+
 // API endpoint for generating twisted history
 app.post('/api/generate', async (req, res) => {
   const { prompt, outputFormat } = req.body;
@@ -78,10 +102,11 @@ app.post('/api/generate', async (req, res) => {
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this fictional event has unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
-        { role: "user", content: `Create an ~200 word ${outputFormat} based on the following alternative history scenario: ${prompt}` },
+        { role: "user", content: `Craft a creative writing piece based on the following alternative history scenario: ${prompt}.` },
       ],
+      n: 1,
       temperature: 0.8,
-      max_tokens: 400,
+      max_tokens: 350,
     });
 
     // NEW: Extract the "creative" response
@@ -91,27 +116,31 @@ app.post('/api/generate', async (req, res) => {
     const correctiveResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are an AI with the role of correcting and improving the historical narrative given to you. Your task is to review the document below and make any necessary corrections to enhance its accuracy and engagement." },
+        { role: "system", content: "Rewrite the following creative writing passage into a compelling ${outputFormat}. Be concise." },
         { role: "user", content: creativeResult },
       ],
       temperature: 0.6,
-      max_tokens: 400,
+      max_tokens: 350,
     });
 
     // NEW: Extract the "corrective" response
     const result = correctiveResponse.data.choices[0].message.content.trim();
     const guid = generateGuid();
 
+    // Generate the image URL
+    const imageUrl = await createImage(prompt);
+
     console.log(result);
 
     // Save the result and GUID to the database
-    db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid) VALUES ($1, $2, $3, $4, $5)', [guid, result, prompt, outputFormat, userGuid], (error) => {
+    db.query('INSERT INTO twisted_history (guid, content, original_prompt, output_format, user_guid, image_url) VALUES ($1, $2, $3, $4, $5, $6)', [guid, result, prompt, outputFormat, userGuid, imageUrl], (error) => {
       if (error) {
         console.error('Error saving to the database:', error);
         return res.status(500).json({ error: 'Failed to save twisted history' });
       }
 
-      res.json({ guid, result });
+      // Include the imageUrl in the response
+      res.json({ guid, result, imageUrl });
     });
 
   } catch (error) {
@@ -135,7 +164,7 @@ app.get('/twist/:guid', (req, res) => {
   const { guid } = req.params;
 
   // Retrieve the result associated with the given GUID from the database
-  db.query('SELECT content, original_prompt, output_format FROM twisted_history WHERE guid = $1', [guid], (error, result) => {
+  db.query('SELECT content, original_prompt, output_format, image_url FROM twisted_history WHERE guid = $1', [guid], (error, result) => {
     if (error) {
       console.error('Error retrieving from the database:', error);
       return res.status(500).json({ error: 'Failed to retrieve twisted history' });
@@ -151,7 +180,7 @@ app.get('/twist/:guid', (req, res) => {
     const row = rows[0]; // Update this line
 
     // Send the twisted history content as a JSON object
-    res.json({ content: row.content, outputFormat: row.output_format, originalPrompt: row.original_prompt });
+    res.json({ content: row.content, outputFormat: row.output_format, originalPrompt: row.original_prompt, imageUrl: row.image_url });
   });
 });
 

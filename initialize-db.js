@@ -49,6 +49,7 @@ db.serialize(async () => {
     await addColumnIfNotExists('original_prompt', 'TEXT');
     await addColumnIfNotExists('output_format', 'TEXT');
     await addColumnIfNotExists('user_guid', 'TEXT');
+    await addColumnIfNotExists('image_url', 'TEXT');
   } catch (error) {
     console.error('Error updating the database schema:', error);
   } finally {
