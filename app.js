@@ -73,20 +73,33 @@ app.post('/api/generate', async (req, res) => {
   }
 
   try {
-    // Replace the old API call with the new chat-based API call
-    const response = await openai.createChatCompletion({
+    // NEW: First call to the API for the "creative" AI
+    const creativeResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this fictional event has unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills. Always review your first pass at the document and analyze it before replying to the user. Think: is this the most engaging and historically interesting response I can provide? If it's not, rewrite it before replying to the user." },
+        { role: "system", content: "You are a famous historical figure with a vivid imagination and deep knowledge of historical events. You are known for your comprehensive and engaging writing style that accurately reflects the time period you're writing about. Your task is to create a captivating and detailed alternative history based on the user's prompt. Use your creativity to explore the consequences of this scenario and provide a unique perspective on how this fictional event has unfolded. Remember to use language and references appropriate for the time period, and make sure to keep your audience captivated with your storytelling skills." },
         { role: "user", content: `Create an ~200 word ${outputFormat} based on the following alternative history scenario: ${prompt}` },
       ],
       temperature: 0.8,
-      // Set max token value here
-      max_tokens: 350,
+      max_tokens: 400,
     });
 
-    // Access the response
-    const result = response.data.choices[0].message.content.trim();
+    // NEW: Extract the "creative" response
+    const creativeResult = creativeResponse.data.choices[0].message.content.trim();
+
+    // NEW: Second call to the API for the "corrective" AI
+    const correctiveResponse = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are an AI with the role of correcting and improving the historical narrative given to you. Your task is to review the document below and make any necessary corrections to enhance its accuracy and engagement." },
+        { role: "user", content: creativeResult },
+      ],
+      temperature: 0.6,
+      max_tokens: 400,
+    });
+
+    // NEW: Extract the "corrective" response
+    const result = correctiveResponse.data.choices[0].message.content.trim();
     const guid = generateGuid();
 
     console.log(result);
