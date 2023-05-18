@@ -42,9 +42,15 @@
 
   <div class="container mx-auto py-12 px-2">
     <h1 class="text-4xl font-bold mb-4">Your History Twister:</h1>
+
+    <!-- NEW: Section to display the generated image -->
+    <div id="imageSection" class="mb-6 flex items-center justify-center">
+      <img id="generatedImage" src="" alt="Generated Image" />
+    </div>
+
     <!-- New section to display the user's original prompt -->
     <div id="originalPrompt" class="bg-gray-200 p-4 rounded-lg shadow-md mb-6 text-lg">
-        <p><b><span id="outputFormatText"></span>:&nbsp;</b><span id="promptText"></span></p>
+        <p><b><span id="promptText"></span></b></p>
     </div>
     <p id="twistedHistory" class="bg-white p-4 rounded-lg shadow-md mb-6 text-lg">
       <!-- The generated content will be displayed here -->
@@ -63,7 +69,7 @@
       <div class="bg-white p-8 rounded">
         <div class="loading"></div>
         <p class="mt-4 text-lg">Remixing history...</p>
-        <p class="mt-2">(about 15 seconds)</p>
+        <p class="mt-2">(about 30 seconds)</p>
       </div>
     </div>
   </div>
@@ -94,15 +100,22 @@
         return response.json();
       })
       .then(data => {
-        if (!data.content || !data.originalPrompt || !data.outputFormat) {
+        // Check the fetched data
+        if (!data.content || !data.originalPrompt || !data.outputFormat || !data.imageUrl) {
           throw new Error('Error fetching twisted history: Missing data');
         }
 
         fetchedData = data; // Assign the fetched data to the variable
 
+        // NEW: Display the generated image
+        const imageSection = document.getElementById('imageSection');
+        const generatedImage = document.getElementById('generatedImage');
+
+        generatedImage.src = data.imageUrl;
+        imageSection.style.display = 'flex';
+
         // Populate the original prompt section
         document.getElementById('promptText').textContent = fetchedData.originalPrompt;
-        document.getElementById('outputFormatText').textContent = fetchedData.outputFormat;
 
         // Set dynamic description for Open Graph and Twitter metadata
         document.getElementById('ogDescription').setAttribute('content', fetchedData.originalPrompt);

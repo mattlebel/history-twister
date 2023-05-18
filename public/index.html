@@ -57,12 +57,12 @@
             <label for="outputFormat" class="block text-lg mb-2">How should we twist your history?</label>
             <div id="outputFormat" class="flex flex-wrap sm:space-x-2 mb-4 pill-buttons">
                 <button class="output-option bg-blue-500 text-white rounded-full px-4 py-2 focus:outline-none pill-button selected" type="button" data-value="newspaper article">As a newspaper article</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="tweet storm">As a tweet storm</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="diary entry">As a diary entry</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="short essay">As a short essay</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="speech">As a speech transcript</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="hot take">As a podcast intro</button>
-                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="interview transcript">As an interview</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="VC-style tweet storm">As a tweet storm</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="diary entry of a notable historical figure">As a diary entry</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="short contrarian blog essay">As a short essay</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="presidential speech">As a speech transcript</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="politicalized hot take">As a hot take</button>
+                <button class="output-option bg-gray-300 text-black rounded-full px-4 py-2 focus:outline-none pill-button" type="button" data-value="hard-hitting interview transcript">As an interview</button>
             </div>
         </div>
         <p id="error-message" class="text-red-500 font-semibold mb-4 hidden"></p>
@@ -86,7 +86,7 @@
           <div class="bg-white p-8 rounded">
             <div class="loading"></div>
             <p class="mt-4 text-lg">Twisting history...</p>
-            <p class="mt-2">(about 15 seconds)</p>
+            <p class="mt-2">(about 30 seconds)</p>
           </div>
         </div>
     </div>
@@ -100,6 +100,27 @@
         <button id="closeModal" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg">Close</button>
       </div>
     </div>
+
+    <script>
+        window.generateImage = async (prompt) => {
+            const response = await fetch('/api/generateImage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Image URL:', data.imageUrl);
+                return data.imageUrl;
+            } else {
+                console.error('Failed to generate image:', response.statusText);
+                return null;
+            }
+        }
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
